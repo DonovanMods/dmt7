@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <Name value="TestModlet" />
+  <DisplayName value="Test Modlet" />
+  <Version value="1.2.3" />
+  <Description value="This is a Test Modlet" />
+  <Author value="Donovan" />
+  <Website value="https://github.com/testing/testmodlet" />
+</xml>
