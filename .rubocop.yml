@@ -8,6 +8,7 @@ AllCops:
   Exclude:
     - 'db/**/*'
     - 'bin/**/*'
+    - 'Guardfile'
 ##
 ## Layout
 ##
