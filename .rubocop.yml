@@ -8,6 +8,20 @@ AllCops:
   Exclude:
     - 'db/**/*'
     - 'bin/**/*'
+##
+## Layout
+##
+Layout/LineLength:
+  Max: 120
+
+##
+## Style
+##
+Style/ClassAndModuleChildren:
+  EnforcedStyle: nested
+
+Style/Documentation:
+  Enabled: false
 
 Style/StringLiterals:
   Enabled: true
@@ -15,7 +29,4 @@ Style/StringLiterals:
 
 Style/StringLiteralsInInterpolation:
   Enabled: true
-  EnforcedStyle: double_quotes
-
-Layout/LineLength:
-  Max: 120
+  EnforcedStyle: single_quotes

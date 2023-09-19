@@ -3,4 +3,4 @@
 
 require "dmt"
 
-puts DMT::VERSION
+DMT::CLI.start(ARGV)
