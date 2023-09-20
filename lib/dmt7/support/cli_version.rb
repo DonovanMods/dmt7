@@ -22,9 +22,6 @@ module DMT7
     option :patch, type: :numeric, aliases: "-p", desc: "Specify the patch version"
     def bump(modlet_path)
       Plugins::Version.new(modlet_path, options).bump.save
-    rescue DMT7error => e
-      DMT7.print_error(e.message)
-      exit 1
     end
   end
 end

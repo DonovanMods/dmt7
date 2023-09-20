@@ -3,4 +3,4 @@
 
 require "dmt7"
 
-DMT7::CLI.start(ARGV)
+DMT7.run!
