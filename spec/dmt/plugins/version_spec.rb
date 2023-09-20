@@ -60,8 +60,8 @@ RSpec.describe DMT::Plugins::Version do
       end
     end
 
-    context "when given no options" do
-      let(:options) { {} }
+    context "when given no version options" do
+      let(:options) { { dry_run: true } }
 
       it "increments the patch version" do
         expect(instance.bump.to_a).to eq([1, 2, 4])

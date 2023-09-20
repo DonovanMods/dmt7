@@ -6,13 +6,16 @@ require "english"
 module DMT
   module Plugins
     class Version
-      attr_reader :major, :minor, :patch, :version, :modinfo_data, :modinfo_file
+      attr_reader :major, :minor, :patch, :modinfo_data, :modinfo_file, :modlet_name, :modlet_path
 
-      def initialize(modlet_path, options)
+      def initialize(modlet, options)
+        @modlet_path = Pathname.new(modlet)
         @options = options.transform_keys(&:to_sym)
 
-        @modinfo_file = File.join(modlet_path, "ModInfo.xml")
-        raise "ModInfo.xml not found in #{@modinfo_file}" unless File.exist?(@modinfo_file)
+        @modlet_name = @modlet_path.basename
+        @modinfo_file = File.join(@modlet_path, "ModInfo.xml")
+
+        raise DMTerror, "#{@modinfo_file} does not exist, or we can't read it" unless File.readable?(@modinfo_file)
 
         @modinfo_data = File.read(@modinfo_file)
         read_version
@@ -21,9 +24,9 @@ module DMT
       def bump
         bump_major if @options[:major]
         bump_minor if @options[:minor]
-        bump_patch if @options[:patch] || @options.values.compact.empty?
+        bump_patch if @options[:patch] || @options.fetch_values(:major, :minor, :patch) { nil }.compact.empty?
 
-        @modinfo_data.gsub!(/version value=".*"/i, "Version value=\"#{self}\"")
+        @modinfo_data.gsub!(/version value=".*"/i, "Version value=\"#{self}\"") if version_changed?
 
         self
       end
@@ -37,7 +40,17 @@ module DMT
       end
 
       def save
-        return if @options[:dry_run]
+        if @options[:dry_run]
+          puts "Dry run, not saving #{@modlet_name}" if @options[:verbose]
+          return
+        end
+
+        unless version_changed?
+          puts "No version change for #{@modlet_name}" if @options[:verbose]
+          return
+        end
+
+        puts "Bumping #{@modlet_name} #{@original_version} -> #{self}" if @options[:verbose]
 
         File.write(@modinfo_file, @modinfo_data)
       end
@@ -46,8 +59,9 @@ module DMT
 
       def read_version
         @modinfo_data.match(/<version value="(.*)"\s+/i)
-        raise "Version not found in ModInfo.xml" unless $LAST_MATCH_INFO
+        raise DMTerror, "Version not found in ModInfo.xml" unless $LAST_MATCH_INFO
 
+        @original_version = $LAST_MATCH_INFO[1]
         @major, @minor, @patch = $LAST_MATCH_INFO[1].split(".").map(&:to_i)
       end
 
@@ -64,6 +78,10 @@ module DMT
 
       def bump_patch
         @patch = (@options[:patch] || (@patch + 1))
+      end
+
+      def version_changed?
+        to_s != @original_version
       end
     end
   end
