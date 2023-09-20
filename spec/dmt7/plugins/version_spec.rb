@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe DMT::Plugins::Version do
+RSpec.describe DMT7::Plugins::Version do
   subject(:instance) { described_class.new(modlet_path, options) }
 
   let(:modlet_path) { "spec/fixtures/test_mod" }

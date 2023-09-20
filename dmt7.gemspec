@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require_relative "lib/dmt"
+require_relative "lib/dmt7"
 
 Gem::Specification.new do |spec|
-  spec.name = "dmt"
-  spec.version = DMT::VERSION
+  spec.name = "dmt7"
+  spec.version = DMT7::VERSION
   spec.authors = ["Donovan Young"]
   spec.email = ["dyoung522@gmail.com"]
 
-  spec.summary = "Tools I use for modding"
-  spec.homepage = "https://www.github.com/donovanmods/dmt"
+  spec.summary = "Tools for modding 7 Days to Die"
+  spec.homepage = "https://www.github.com/donovanmods/dmt7"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
 

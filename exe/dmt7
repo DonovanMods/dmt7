@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "dmt"
+require "dmt7"
 
-DMT::CLI.start(ARGV)
+DMT7::CLI.start(ARGV)

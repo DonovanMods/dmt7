@@ -1,24 +1,18 @@
-# Donovan's Modding Tools (DMT)
+# Donovan's Modding Tools for 7 Dayd to Die (DMT7)
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/dmt`. To experiment with that code, run `bin/console` for an interactive prompt.
+Tools for modding 7 Days to Die in Ruby.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+To install the `dmt7` utilizy, run:
 
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    gem install dmt7
 
 ## Usage
 
-TODO: Write usage instructions here
+Help is available with
+
+    dmt7 help
 
 ## Development
 
@@ -28,7 +22,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/dmt.
+Bug reports and pull requests are welcome on GitHub at <https://github.com/donovanmods/dmt7>
 
 ## License
 

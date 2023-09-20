@@ -2,14 +2,14 @@
 
 require "colorize"
 
-require_relative "dmt/plugins/version"
-require_relative "dmt/cli"
+require_relative "dmt7/plugins/version"
+require_relative "dmt7/cli"
 
-module DMT
-  PROGRAM_NAME = "dmt"
+module DMT7
+  PROGRAM_NAME = "dmt7"
   VERSION = "0.1.0"
 
-  class DMTerror < StandardError; end
+  class DMT7error < StandardError; end
 
   def self.print_error(message)
     puts "Whoops! Something went wrong!".colorize(color: :yellow, mode: :bold)

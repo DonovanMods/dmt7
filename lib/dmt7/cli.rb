@@ -3,14 +3,14 @@
 require "thor"
 require_relative "support/cli_version"
 
-module DMT
+module DMT7
   class CLI < Thor
     class_option :verbose, type: :boolean, aliases: "-v"
 
     map %w[--version -V] => :__version
-    desc "--version, -V", "Prints the version of DMT"
+    desc "--version, -V", "Prints the version of DMT7"
     def __version
-      puts "#{DMT::PROGRAM_NAME} v#{DMT::VERSION}"
+      puts "#{DMT7::PROGRAM_NAME} v#{DMT7::VERSION}"
     end
 
     def self.exit_on_failure?

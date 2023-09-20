@@ -3,7 +3,7 @@
 
 require "english"
 
-module DMT
+module DMT7
   module Plugins
     class Version
       attr_reader :major, :minor, :patch, :modinfo_data, :modinfo_file, :modlet_name, :modlet_path
@@ -15,7 +15,7 @@ module DMT
         @modlet_name = @modlet_path.basename
         @modinfo_file = File.join(@modlet_path, "ModInfo.xml")
 
-        raise DMTerror, "#{@modinfo_file} does not exist, or we can't read it" unless File.readable?(@modinfo_file)
+        raise DMT7error, "#{@modinfo_file} does not exist, or we can't read it" unless File.readable?(@modinfo_file)
 
         @modinfo_data = File.read(@modinfo_file)
         read_version
@@ -59,7 +59,7 @@ module DMT
 
       def read_version
         @modinfo_data.match(/<version value="(.*)"\s+/i)
-        raise DMTerror, "Version not found in ModInfo.xml" unless $LAST_MATCH_INFO
+        raise DMT7error, "Version not found in ModInfo.xml" unless $LAST_MATCH_INFO
 
         @original_version = $LAST_MATCH_INFO[1]
         @major, @minor, @patch = $LAST_MATCH_INFO[1].split(".").map(&:to_i)

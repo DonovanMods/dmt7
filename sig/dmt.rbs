@@ -1,4 +1,4 @@
-module DMT
+module DMT7
   VERSION: String
   PROGRAM_NAME: String
 end
