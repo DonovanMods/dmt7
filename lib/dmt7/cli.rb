@@ -2,12 +2,20 @@
 
 require "thor"
 require "yaml"
-require_relative "support/cli_version"
+# require_relative "support/thor_base"
+
+# Require all files
+base_dir = %w[lib dmt7]
+%w[support plugins sub_commands].each do |dir|
+  Dir[File.join(base_dir, dir, "**", "**")].each do |path|
+    require_relative File.join(path.split("/") - base_dir) if File.file?(path)
+  end
+end
 
 module DMT7
   CONFIG_FILE = Pathname.new(File.join(Dir.pwd, ".dmt7.yml"))
 
-  class CLI < Thor
+  class CLI < ThorBase
     def self.exit_on_failure?
       true
     end
@@ -15,33 +23,11 @@ module DMT7
     class_option :config,
                  type: :string,
                  desc: "Specify an alternative config file. Default is \"#{DMT7::CONFIG_FILE.basename}\""
-    class_option :verbose,
-                 type: :boolean,
-                 aliases: "-v",
-                 desc: "Prints more verbose output"
 
-    map %w[--version -V] => :__version
-    desc "--version, -V", "Prints the version of DMT7"
-    def __version
-      version_string
-      exit 0
-    end
-
-    no_commands do
-      def options
-        original_options = super
-        config_options = YAML.load_file(original_options.fetch(:config, DMT7::CONFIG_FILE))
-        original_options.merge(config_options)
-      end
-
-      def version_string
-        puts "#{DMT7::PROGRAM_NAME.upcase.colorize(:bold)} " +
-             "v#{DMT7::VERSION} ".colorize(:green) +
-             "by #{DMT7::AUTHOR}".colorize(:blue)
-      end
-    end
+    desc "xml SUBCOMMAND ...ARGS", "XML related commands"
+    subcommand "xml", SubCommands::Xml
 
     desc "version SUBCOMMAND ...ARGS", "Version related commands"
-    subcommand "version", CLIversion
+    subcommand "version", SubCommands::Version
   end
 end

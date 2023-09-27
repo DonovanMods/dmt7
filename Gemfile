@@ -8,6 +8,7 @@ gemspec
 group :development do
   gem "guard"
   gem "guard-rspec"
+  gem "pry"
   gem "rake"
   gem "rspec"
   gem "rubocop"

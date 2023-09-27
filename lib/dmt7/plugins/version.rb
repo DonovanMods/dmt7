@@ -8,6 +8,10 @@ module DMT7
     class Version
       attr_reader :major, :minor, :patch, :modinfo_data, :modinfo_file, :modlet_name, :modlet_path
 
+      def self.call(...)
+        new(...).bump.save
+      end
+
       def initialize(modlet, options)
         @modlet_path = Pathname.new(modlet)
         @options = options.transform_keys(&:to_sym)
@@ -41,16 +45,16 @@ module DMT7
 
       def save
         if @options[:dry_run]
-          puts "Dry run, not saving #{@modlet_name}" if @options[:verbose]
+          puts "Dry run, not saving #{@modlet_name}" if @options[:verbosity]
           return
         end
 
         unless version_changed?
-          puts "No version change for #{@modlet_name}" if @options[:verbose]
+          puts "No version change for #{@modlet_name}" if @options[:verbosity]
           return
         end
 
-        puts "Bumping #{@modlet_name} #{@original_version} -> #{self}" if @options[:verbose]
+        puts "Bumping #{@modlet_name} #{@original_version} -> #{self}" if @options[:verbosity]
 
         File.write(@modinfo_file, @modinfo_data)
       end
