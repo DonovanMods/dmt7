@@ -8,15 +8,15 @@ module DMT7
       class Validate
         include ApplicationHelpers
 
-        attr_reader :errors, :game, :modlet
+        attr_reader :errors, :game_configs, :modlet_configs
 
-        def initialize(modlet, options = {})
+        def initialize(modlet_path:, game_configs:, options: {})
           @errors = []
           @options = options
           @verbosity = options.fetch(:verbosity, 0)
 
-          @game = load_xml options.fetch(:game_config_path)
-          @modlet = load_xml File.join(modlet, "Config")
+          @game_configs = game_configs
+          @modlet_configs = load_xml modlet_path
 
           validate
         end
@@ -27,7 +27,6 @@ module DMT7
         end
 
         def valid?
-          # TODO: True or False depending on validation result
           @errors.empty?
         end
 
@@ -38,7 +37,10 @@ module DMT7
           raise DMT7error, "Invalid Directory #{path}" unless path.directory? && path.readable?
 
           puts "Loading XMLs from #{truncate_path(path)}" if @verbosity
-          XML::Parse.call(path:, verbosity: @verbosity)
+          result = XML::Parse.call(path, **@options)
+          raise DMT7error, result.errors.join("\n") unless result.success?
+
+          result
         end
       end
     end

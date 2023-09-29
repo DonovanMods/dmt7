@@ -1,0 +1,3 @@
+<configs>
+  <set xpath="//test/@value">test</set>
+</configs>
