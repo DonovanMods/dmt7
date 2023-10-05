@@ -3,6 +3,13 @@
 module DMT7
   class ThorBase < Thor
     include Thor::Actions
+    include Logging
+
+    class << self
+      def exit_on_failure?
+        true
+      end
+    end
 
     class_option :verbose,
                  type: :boolean,
@@ -22,24 +29,43 @@ module DMT7
 
     no_commands do
       def options
-        original_options = super
-        config_options = YAML.load_file(original_options.fetch(:config, DMT7::CONFIG_FILE))
-
-        config_options["verbosity"] = 0
-        if original_options[:verbose].is_a?(Array)
-          config_options["verbosity"] = original_options[:verbose].all? ? original_options[:verbose].size : 0
-        end
-        # Overide verbosity if DEBUG is set
-        config_options["verbosity"] = 5 if ENV.fetch("DEBUG", nil)
-
+        original_options = super.transform_keys(&:to_sym)
+        config_options = load_config(original_options.fetch(:config, DMT7::CONFIG_FILE))
+        config_options[:verbosity] = set_verbosity(config_options.fetch(:verbosity, 0), original_options)
         original_options.merge(config_options)
       end
+    end
 
-      def version_string
-        puts "#{DMT7::PROGRAM_NAME.upcase.colorize(:bold)} " +
-             "v#{DMT7::VERSION} ".colorize(:green) +
-             "by #{DMT7::AUTHOR}".colorize(:blue)
+    private
+
+    def load_config(file)
+      raise DMT7::Error, "Config file #{file} not found" unless File.readable?(file)
+
+      @load_config ||= YAML.load_file(file).transform_keys(&:to_sym)
+    end
+
+    def print_errors(errors = [])
+      logger.error errors.flatten.compact.uniq.join("\n") if options[:verbosity]&.positive?
+    end
+
+    def set_verbosity(verbosity, options)
+      if options.fetch(:verbose, nil).is_a?(Array)
+        verbosity = options[:verbose].all? ? options[:verbose].size : 0
       end
+
+      # Overide verbosity if dry_run is set
+      verbosity = 1 if options[:dry_run] && verbosity.zero?
+
+      # Overide verbosity if DEBUG is set
+      verbosity = 5 if ENV.fetch("DEBUG", nil)
+
+      verbosity
+    end
+
+    def version_string
+      puts DMT7::PROGRAM_NAME.upcase.white +
+           " v#{DMT7::VERSION} " +
+           "by #{DMT7::AUTHOR}".cyanish
     end
   end
 end

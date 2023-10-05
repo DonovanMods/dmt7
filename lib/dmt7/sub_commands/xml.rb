@@ -18,7 +18,7 @@ module DMT7
         # TODO: This should apply the modlet and print the modified game_configs
         # puts game_configs.element_names
         if game_configs.failure?
-          puts game_configs.errors.join("\n")
+          print_errors
           exit 1
         end
         # game_configs.files.map { |k, v| puts "#{k} -> #{v}" }
@@ -30,18 +30,18 @@ module DMT7
         `xml validate MODLET_PATH` will attempt to validate the XMLs in MODLET_PATH.\n
       LONGDESC
       def validate(modlet_path)
-        validate = Plugins::XML::Validate.new(modlet_path:, game_configs:, options:)
-        exit 1 unless validate.valid?
+        validate = Plugins::XML::Validate.call(modlet_path:, game_configs:, options:)
 
-        puts "Items:\n#{game_configs.xpath("//items/item[@name='resourceWood']")}"
-        puts "Modlet XML:\n#{validate.modlet_configs.to_xml(indent: 4)}"
+        # puts "Items:\n#{game_configs.xpath("//items/item[@name='resourceWood']")}"
+        # puts "Modlet XML:\n#{validate.modlet_configs.to_xml(indent: 4)}"
 
-        exit 0
+        print_errors validate.errors unless validate.valid?
+        exit validate.valid? ? 0 : 1
       end
 
       no_commands do
         def game_configs
-          @game_configs ||= Plugins::XML::Parse.call(options.fetch(:game_config_path), **options)
+          @game_configs ||= Plugins::XML::Parse.new(options.fetch(:game_config_path), **options)
         end
       end
     end

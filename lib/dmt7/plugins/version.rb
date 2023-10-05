@@ -6,6 +6,8 @@ require "english"
 module DMT7
   module Plugins
     class Version
+      include Logging
+
       attr_reader :major, :minor, :patch, :modinfo_data, :modinfo_file, :modlet_name, :modlet_path
 
       def self.call(...)
@@ -45,16 +47,16 @@ module DMT7
 
       def save
         if @options[:dry_run]
-          puts "Dry run, not saving #{@modlet_name}" if @options[:verbosity]
+          logger.info "Dry run, not saving #{@modlet_name}"
           return
         end
 
         unless version_changed?
-          puts "No version change for #{@modlet_name}" if @options[:verbosity]
+          logger.info "No version change for #{@modlet_name}"
           return
         end
 
-        puts "Bumping #{@modlet_name} #{@original_version} -> #{self}" if @options[:verbosity]
+        Logger.info "Bumping #{@modlet_name} #{@original_version} -> #{self}"
 
         File.write(@modinfo_file, @modinfo_data)
       end

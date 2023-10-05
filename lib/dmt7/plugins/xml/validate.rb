@@ -5,25 +5,31 @@ require "nokogiri"
 module DMT7
   module Plugins
     module XML
-      class Validate
+      class Validate < ApplicationService
         include ApplicationHelpers
 
-        attr_reader :errors, :game_configs, :modlet_configs
+        attr_reader :errors, :modlet_configs
 
         def initialize(modlet_path:, game_configs:, options: {})
-          @errors = []
-          @options = options
-          @verbosity = options.fetch(:verbosity, 0)
+          super(**options)
 
+          @modlet_path = Pathname.new(modlet_path)
+          @modlet_name = @modlet_path.basename
           @game_configs = game_configs
-          @modlet_configs = load_xml modlet_path
-
-          validate
+          @modlet_configs = load_modlet
         end
 
-        def validate
+        def call
           # TODO: Validate XML
-          true
+          result = @game_configs.apply(@modlet_configs)
+
+          if result.success?
+            logger.info "XMLs for #{@modlet_name} are valid" if @verbosity.positive?
+          else
+            @errors += result.errors
+          end
+
+          self
         end
 
         def valid?
@@ -32,12 +38,12 @@ module DMT7
 
         private
 
-        def load_xml(path)
-          path = Pathname.new(path)
-          raise DMT7error, "Invalid Directory #{path}" unless path.directory? && path.readable?
+        def load_modlet
+          raise DMT7error, "Invalid Directory #{@modlet_path}" unless @modlet_path.directory? && @modlet_path.readable?
 
-          puts "Loading XMLs from #{truncate_path(path)}" if @verbosity
-          result = XML::Parse.call(path, **@options)
+          logger.info "Validating XMLs in #{truncate_path(@modlet_path)}"
+
+          result = XML::Parse.new(@modlet_path, **@options)
           raise DMT7error, result.errors.join("\n") unless result.success?
 
           result

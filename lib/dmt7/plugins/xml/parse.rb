@@ -5,23 +5,56 @@ require "tmpdir"
 module DMT7
   module Plugins
     module XML
-      class Parse < ApplicationService
-        attr_reader :files, :path, :xml
+      class Parse
+        include Logging
+
+        attr_reader :errors, :files, :path, :xml
 
         ROOT_NODE = "root"
 
         def initialize(path, **options)
+          @errors = []
           @files = {}
+          @options = options
           @path = path
           @verbosity = options.fetch(:verbosity, 0)
           @dry_run = options.fetch(:dry_run, false)
-          @xml = Nokogiri::XML("<#{ROOT_NODE}/>", &:noblanks)
 
-          super
+          @xml = Nokogiri::XML("<#{ROOT_NODE}/>", &:noblanks)
+          @xml.encoding = "UTF-8"
+          @xml.remove_namespaces!
+
+          load
+        end
+
+        def success?
+          @errors.empty?
+        end
+
+        def failure?
+          !success?
+        end
+
+        def apply(modlet)
+          raise DMT7error, "Invalid modlet #{modlet}" unless modlet.is_a?(DMT7::Plugins::XML::Parse)
+
+          modlet.element_children.children.each do |node|
+            next unless node.type == Nokogiri::XML::Node::ELEMENT_NODE
+
+            result = invoke_command(node)
+            @errors += result.errors if result&.failure?
+          end
+
+          self
+        end
+
+        def element_names(node = nil)
+          node = xml.at(ROOT_NODE) if node.nil?
+          node.element_children.map(&:name).uniq.sort
         end
 
         def write_xmls(keys = element_names)
-          puts "Dry Run enabled -- no files will be created." if @dry_run && @verbosity
+          logger.info "Dry Run enabled -- no files will be created." if @dry_run
 
           tmp_dir = @dry_run ? "tmp/dry-run" : Dir.mktmpdir(nil, "tmp")
 
@@ -32,18 +65,7 @@ module DMT7
           end
         end
 
-        def element_names(node = nil)
-          node = xml.at(ROOT_NODE) if node.nil?
-          node.element_children.map(&:name).uniq.sort
-        end
-
-        def call
-          success(load)
-        rescue StandardError => e
-          failure(e.message)
-        end
-
-        def respond_to_missing?(method)
+        def respond_to_missing?(method, respond_to_private = false)
           xml.at(ROOT_NODE).respond_to?(method) || super
         end
 
@@ -51,6 +73,7 @@ module DMT7
           if xml.at(ROOT_NODE).respond_to?(method)
             xml.at(ROOT_NODE).send(method, *, &)
           else
+            @errors << "Invalid method #{method}"
             super
           end
         end
@@ -58,16 +81,30 @@ module DMT7
         private
 
         def load
-          Dir.chdir(ckpath(path)) do
+          Dir.chdir(ck_path(path)) do
             Dir["**/**.xml"].each do |config_file|
               node = mknode(config_file)
               @files[config_file] = element_names(node)
-              @xml.at(ROOT_NODE).add_child(node.children)
+              @xml.at(ROOT_NODE) << node.children
             end
+          end
+        rescue StandardError => e
+          @errors << e.message
+        end
+
+        def invoke_command(node)
+          case node.name
+          when "append"
+            Commands::Append.call(node:, xml: @xml, **@options)
+          when /(csv|set)/
+            ApplicationService.new
+          else
+            @errors << "COMMAND_NOT_IMPLEMENTED: #{node.name}"
+            nil
           end
         end
 
-        def ckpath(path)
+        def ck_path(path)
           path = File.join(path, "Config") unless File.basename(path) =~ /config/i
           raise DMT7error, "Invalid directory #{path}" unless File.directory?(path) && File.readable?(path)
 
@@ -77,12 +114,12 @@ module DMT7
         def mknode(file)
           raise DMT7error, "Invalid file #{file}" unless File.file?(file) && File.readable?(file)
 
-          Nokogiri::XML(File.read(file))
+          Nokogiri::XML.parse(File.read(file))
         end
 
         def write(file, node)
-          puts "writing #{file}" if @verbosity > 1
-          File.open(file, "w") { |f| node.write_xml_to(f, encoding: "UTF-8", indent: 4) } unless @dry_run
+          puts.debug "writing #{file}"
+          File.open(file, "w") { |f| node&.write_xml_to(f, encoding: "UTF-8", indent: 4) } unless @dry_run
         end
       end
     end

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require "thor"
-require "yaml"
-# require_relative "support/thor_base"
+require_relative "logging"
 
 # Require all files
 base_dir = %w[lib dmt7]
@@ -16,8 +15,14 @@ module DMT7
   CONFIG_FILE = Pathname.new(File.join(Dir.pwd, ".dmt7.yml"))
 
   class CLI < ThorBase
-    def self.exit_on_failure?
-      true
+    include DMT7::Logging
+
+    def initialize(...)
+      super
+
+      return unless ENV.fetch("DEBUG", nil)
+
+      logger.debug ["DEBUG MODE ENABLED", "CONFIG_FILE: #{CONFIG_FILE}", "OPTIONS", options, ""]
     end
 
     class_option :config,

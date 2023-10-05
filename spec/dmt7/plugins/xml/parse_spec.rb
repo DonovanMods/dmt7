@@ -1,19 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe DMT7::Plugins::XML::Parse do
-  subject(:instance) { described_class.call(config_path) }
+  subject(:instance) { described_class.new(config_path) }
 
   let(:elements) { %w[items] }
   let(:files) { %w[testing.xml] }
   let(:files_hash) { files.each_with_object({}) { |f, h| h[f] = elements } }
 
-  it "is an Application Service" do
-    expect(described_class).to be < DMT7::ApplicationService
-  end
-
   shared_examples "a config dir" do
     it "is a success" do
-      expect(instance.success?).to be(true)
+      expect(instance).to be_a_success
     end
 
     describe "#files" do
@@ -33,7 +29,7 @@ RSpec.describe DMT7::Plugins::XML::Parse do
     let(:config_path) { "spec/fixtures/missing_mod" }
 
     it "is a failure" do
-      expect(instance.failure?).to be(true)
+      expect(instance).to be_a_failure
     end
 
     it "has an error message" do

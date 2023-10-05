@@ -31,8 +31,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  # spec.add_dependency "activesupport", "~> 7.0"
-  spec.add_dependency "colorize", "~> 1.1"
+  spec.add_dependency "awesome_print", "~> 1.9"
   spec.add_dependency "nokogiri", "~> 1.15"
   spec.add_dependency "thor", "~> 1.2"
 

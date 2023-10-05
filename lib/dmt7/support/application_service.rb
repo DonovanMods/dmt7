@@ -8,9 +8,13 @@ module DMT7
     class ServiceFailure < StandardError; end
 
     # Initialize the service with any arguments
-    def initialize(...)
+    def initialize(**options)
       @data = nil
       @errors = []
+      @options = options
+
+      @dry_run = options.fetch(:dry_run, false)
+      @verbosity = options.fetch(:verbosity, 0)
     end
 
     # Convenience method for calling the service
