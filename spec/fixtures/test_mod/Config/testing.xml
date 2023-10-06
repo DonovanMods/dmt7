@@ -1,3 +1,8 @@
 <configs>
+  <append xpath="//test">
+    <test>
+      foo
+    </test>
+  </append>
   <set xpath="//test/@value">test</set>
 </configs>

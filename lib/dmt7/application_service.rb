@@ -3,9 +3,11 @@
 # Purpose: Base class for all services. Provides a few convenience methods
 module DMT7
   class ApplicationService
-    attr_reader :data, :errors
+    include Logging
 
     class ServiceFailure < StandardError; end
+
+    attr_reader :data, :errors
 
     # Initialize the service with any arguments
     def initialize
@@ -34,20 +36,25 @@ module DMT7
 
     private
 
-    # Convenience method for returning a success object
-    def success(value = nil)
-      @errors = []
-      @data = value unless value.nil?
+    def result(message = nil, data: nil, errors: [], level: :warn)
+      logger.send(level, message) unless message.nil?
+
+      @data = data unless data.nil?
+      @errors = errors unless errors.empty?
 
       self
     end
 
-    # Convenience method for returning a failure object
-    def failure(error = nil)
-      @errors << error unless error.nil?
-      @data = nil
+    # Convenience method for returning a success object
+    def success(message = nil, **)
+      result(message, **)
+    end
 
-      self
+    # Convenience method for returning a failure object
+    def failure(message, errors: [], **)
+      @errors << message unless errors.any?
+
+      result(message, errors:, level: :error, **)
     end
   end
 end

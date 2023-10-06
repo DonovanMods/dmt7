@@ -8,7 +8,7 @@ module DMT7
       class Validate < ApplicationService
         include ApplicationHelpers
 
-        attr_reader :errors, :modlet_configs
+        attr_reader :errors, :modlet_configs, :game_configs
 
         def initialize(modlet_path:, game_configs:)
           super()
@@ -23,12 +23,10 @@ module DMT7
           # TODO: Validate XML
           result = @game_configs.apply(@modlet_configs)
 
-          if result.success?
-            logger.warn "XMLs for #{@modlet_name} are valid"
-          else
-            logger.error "XMLs for #{@modlet_name} are NOT valid"
-            @errors += result.errors
-          end
+          return success("XMLs for #{@modlet_name} are valid") if result.success?
+
+          @errors = result.errors
+          failure("XMLs for #{@modlet_name} are NOT valid", errors: result.errors)
 
           self
         end

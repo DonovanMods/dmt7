@@ -3,6 +3,7 @@
 require "config"
 
 require_relative "dmt7/logging"
+require_relative "dmt7/application_service"
 
 module DMT7
   include Logging

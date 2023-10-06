@@ -14,7 +14,7 @@ module DMT7
              type: :array,
              repeatable: true,
              desc: "The specific files to dump -- default is all files in the modlet"
-      def dump(modlet_path)
+      def dump(_modlet_path)
         # TODO: This should apply the modlet and print the modified game_configs
         # puts game_configs.element_names
         if game_configs.failure?
@@ -31,11 +31,6 @@ module DMT7
       LONGDESC
       def validate(modlet_path)
         validate = Plugins::XML::Validate.call(modlet_path:, game_configs:)
-
-        # puts "Items:\n#{game_configs.xpath("//items/item[@name='resourceWood']")}"
-        # puts "Modlet XML:\n#{validate.modlet_configs.to_xml(indent: 4)}"
-
-        print_errors validate.errors unless validate.valid?
         exit validate.valid? ? 0 : 1
       end
 
