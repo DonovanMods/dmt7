@@ -12,13 +12,10 @@ module DMT7
 
         ROOT_NODE = "root"
 
-        def initialize(path, **options)
+        def initialize(path)
           @errors = []
           @files = {}
-          @options = options
           @path = path
-          @verbosity = options.fetch(:verbosity, 0)
-          @dry_run = options.fetch(:dry_run, false)
 
           @xml = Nokogiri::XML("<#{ROOT_NODE}/>", &:noblanks)
           @xml.encoding = "UTF-8"
@@ -54,9 +51,9 @@ module DMT7
         end
 
         def write_xmls(keys = element_names)
-          logger.info "Dry Run enabled -- no files will be created." if @dry_run
+          logger.info "Dry Run enabled -- no files will be created." if Opt.dry_run
 
-          tmp_dir = @dry_run ? "tmp/dry-run" : Dir.mktmpdir(nil, "tmp")
+          tmp_dir = Opt.dry_run ? "tmp/dry-run" : Dir.mktmpdir(nil, "tmp")
 
           files.each do |filename, elements|
             elements.each do |element|
@@ -95,7 +92,7 @@ module DMT7
         def invoke_command(node)
           case node.name
           when "append"
-            Commands::Append.call(node:, xml: @xml, **@options)
+            Commands::Append.call(node, @xml)
           when /(csv|set)/
             ApplicationService.new
           else
@@ -119,7 +116,7 @@ module DMT7
 
         def write(file, node)
           puts.debug "writing #{file}"
-          File.open(file, "w") { |f| node&.write_xml_to(f, encoding: "UTF-8", indent: 4) } unless @dry_run
+          File.open(file, "w") { |f| node&.write_xml_to(f, encoding: "UTF-8", indent: 4) } unless Opt.dry_run
         end
       end
     end

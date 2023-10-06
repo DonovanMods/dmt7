@@ -14,7 +14,7 @@ module DMT7
       option :minor, type: :numeric, aliases: "-m", desc: "Specify the minor version"
       option :patch, type: :numeric, aliases: "-p", desc: "Specify the patch version"
       def bump(modlet_path)
-        Plugins::Version.call(modlet_path, options)
+        Plugins::Version.call(modlet_path)
       end
     end
   end

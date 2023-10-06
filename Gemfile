@@ -6,6 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
+  gem "debug"
   gem "guard"
   gem "guard-rspec"
   gem "pry"
@@ -13,7 +14,7 @@ group :development do
   gem "rspec"
   gem "rubocop"
   gem "rubocop-rspec"
-  gem "sorbet", "~> 0.5"
-  gem "sorbet-runtime", "~> 0.5"
+  gem "sorbet"
+  gem "sorbet-runtime"
   gem "tapioca", require: false
 end

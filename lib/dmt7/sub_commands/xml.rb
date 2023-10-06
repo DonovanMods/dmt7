@@ -30,7 +30,7 @@ module DMT7
         `xml validate MODLET_PATH` will attempt to validate the XMLs in MODLET_PATH.\n
       LONGDESC
       def validate(modlet_path)
-        validate = Plugins::XML::Validate.call(modlet_path:, game_configs:, options:)
+        validate = Plugins::XML::Validate.call(modlet_path:, game_configs:)
 
         # puts "Items:\n#{game_configs.xpath("//items/item[@name='resourceWood']")}"
         # puts "Modlet XML:\n#{validate.modlet_configs.to_xml(indent: 4)}"
@@ -41,7 +41,7 @@ module DMT7
 
       no_commands do
         def game_configs
-          @game_configs ||= Plugins::XML::Parse.new(options.fetch(:game_config_path), **options)
+          @game_configs ||= Plugins::XML::Parse.new(Opt.game_config_path)
         end
       end
     end

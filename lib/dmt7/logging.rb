@@ -15,24 +15,17 @@ module DMT7
     }.freeze
 
     Formatter = proc do |severity, _datetime, _progname, msg|
-      #  "#{datetime.strftime("%F %T")} #{severity.red}: #{msg}\n"
-      # "#{severity.red}: #{msg}\n"
       color = SEVERITY_COLOR[severity.downcase.to_sym]
-
       "#{[msg].flatten.map { |m| m.is_a?(String) ? m.send(color) : "#{m.class.ai}\n#{m.ai}" }.join("\n")}\n"
     end
 
     def self.level
-      return :debug if ENV.fetch("DEBUG", nil)
-
-
-      verbosity = [0, options.fetch(:verbosity, 1).to_i - 1].max
-
-      %i[error warn info][[2, verbosity].min]
+      verbosity = [0, Opt.verbosity || 0].max
+      %i[error warn info debug][[3, verbosity].min]
     end
 
-    def logger
-      Logging.logger
+    def logger(...)
+      Logging.logger(...)
     end
 
     def print_error
@@ -45,8 +38,8 @@ module DMT7
       logger.fatal "#{error.backtrace.join("\n")[0...2048]}\n"
     end
 
-    def self.logger
-      @logger ||= Logger.new($stdout, level:, formatter: Formatter)
+    def self.logger(stream: $stdout)
+      @logger ||= Logger.new(stream, level:, formatter: Formatter)
     end
   end
 end

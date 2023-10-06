@@ -7,8 +7,8 @@ module DMT7
         class Append < ApplicationService
           include ApplicationHelpers
 
-          def initialize(node:, xml:, **options)
-            super(**options)
+          def initialize(node, xml)
+            super()
 
             @node = node
             @xpath = clean_xpath(node["xpath"])

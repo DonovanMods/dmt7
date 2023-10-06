@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe DMT7::Plugins::XML::Validate do
-  subject(:instance) { described_class.call(game_configs:, modlet_path:, options:) }
+  subject(:instance) { described_class.call(game_configs:, modlet_path:) }
 
   let(:game_configs) { DMT7::Plugins::XML::Parse.new(options[:game_config_path]) }
   let(:modlet_path) { "spec/fixtures/test_mod" }

@@ -1,0 +1,2 @@
+game_config_path: spec/fixtures/test_game/Config
+verbosity: 0

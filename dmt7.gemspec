@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "awesome_print", "~> 1.9"
+  spec.add_dependency "config", "~> 4.2"
   spec.add_dependency "nokogiri", "~> 1.15"
   spec.add_dependency "thor", "~> 1.2"
 

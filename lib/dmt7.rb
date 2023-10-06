@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require "yaml"
+require "config"
 
-require_relative "dmt7/cli"
 require_relative "dmt7/logging"
 
 module DMT7
   include Logging
 
+  AUTHOR = "Donovan C. Young"
   PROGRAM_NAME = "dmt7"
   VERSION = "0.1.0"
-  AUTHOR = "Donovan C. Young"
+  CONFIG_FILE = Pathname.new(File.join(Dir.pwd, ".dmt7.yml"))
 
   class DMT7error < StandardError; end
 
@@ -23,6 +23,10 @@ module DMT7
   end
 
   def self.init
-    true
+    Config.setup do |config|
+      config.const_name = "Opt"
+    end
   end
 end
+
+require_relative "dmt7/cli"

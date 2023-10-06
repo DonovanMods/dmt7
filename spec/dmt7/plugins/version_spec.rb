@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe DMT7::Plugins::Version do
-  subject(:instance) { described_class.new(modlet_path, options) }
+  subject(:instance) { described_class.new(modlet_path) }
 
   let(:modlet_path) { "spec/fixtures/test_mod" }
-  let(:options) { {} }
+  let(:options) { { dry_run: true } }
+
+  before { Opt.merge!(options) }
 
   describe "#major" do
     it { is_expected.to respond_to(:major) }
@@ -61,7 +63,7 @@ RSpec.describe DMT7::Plugins::Version do
     end
 
     context "when given no version options" do
-      let(:options) { { dry_run: true } }
+      let(:options) { { major: nil, minor: nil, patch: nil } }
 
       it "increments the patch version" do
         expect(instance.bump.to_a).to eq([1, 2, 4])
@@ -109,7 +111,7 @@ RSpec.describe DMT7::Plugins::Version do
     end
 
     context "when not given a dry run option" do
-      let(:options) { {} }
+      let(:options) { { dry_run: false } }
 
       it "saves the version" do
         instance.bump.save

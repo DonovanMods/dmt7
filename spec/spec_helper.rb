@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "config"
 require "dmt7"
 
 RSpec.configure do |config|
@@ -13,3 +14,10 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+Config.setup do |config|
+  config.const_name = "Opt"
+end
+Config.load_and_set_settings(File.join(Dir.pwd, "spec", "fixtures", "testopts.yml"))
+
+Logger = DMT7::Logging.logger(stream: nil)

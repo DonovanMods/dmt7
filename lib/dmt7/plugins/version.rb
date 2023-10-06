@@ -14,10 +14,8 @@ module DMT7
         new(...).bump.save
       end
 
-      def initialize(modlet, options)
+      def initialize(modlet)
         @modlet_path = Pathname.new(modlet)
-        @options = options.transform_keys(&:to_sym)
-
         @modlet_name = @modlet_path.basename
         @modinfo_file = File.join(@modlet_path, "ModInfo.xml")
 
@@ -28,9 +26,9 @@ module DMT7
       end
 
       def bump
-        bump_major if @options[:major]
-        bump_minor if @options[:minor]
-        bump_patch if @options[:patch] || @options.fetch_values(:major, :minor, :patch) { nil }.compact.empty?
+        bump_major if key_set?(:major)
+        bump_minor if key_set?(:minor)
+        bump_patch if key_set?(:patch) || Opt.to_h.values_at(:major, :minor, :patch).compact.empty?
 
         @modinfo_data.gsub!(/version value=".*"/i, "Version value=\"#{self}\"") if version_changed?
 
@@ -46,7 +44,7 @@ module DMT7
       end
 
       def save
-        if @options[:dry_run]
+        if Opt.dry_run
           logger.info "Dry run, not saving #{@modlet_name}"
           return
         end
@@ -63,6 +61,10 @@ module DMT7
 
       private
 
+      def key_set?(key)
+        Opt.key?(key) && !Opt[key].nil?
+      end
+
       def read_version
         @modinfo_data.match(/<version value="(.*)"\s+/i)
         raise DMT7error, "Version not found in ModInfo.xml" unless $LAST_MATCH_INFO
@@ -72,18 +74,18 @@ module DMT7
       end
 
       def bump_major
-        @major = (@options[:major] || (@major + 1))
-        @minor = (@options[:minor] || 0)
-        @patch = (@options[:patch] || 0)
+        @major = (Opt.major || (@major + 1))
+        @minor = (Opt.minor || 0)
+        @patch = (Opt.patch || 0)
       end
 
       def bump_minor
-        @minor = (@options[:minor] || (@minor + 1))
-        @patch = (@options[:patch] || 0)
+        @minor = (Opt.minor || (@minor + 1))
+        @patch = (Opt.patch || 0)
       end
 
       def bump_patch
-        @patch = (@options[:patch] || (@patch + 1))
+        @patch = (Opt.patch || (@patch + 1))
       end
 
       def version_changed?

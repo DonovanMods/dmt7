@@ -15,3 +15,5 @@ sorbet/rbi/hidden-definitions/errors.txt
 
 
 .dmt7.yml
+
+.vscode/

@@ -27,39 +27,10 @@ module DMT7
       exit 0
     end
 
-    no_commands do
-      def options
-        original_options = super.transform_keys(&:to_sym)
-        config_options = load_config(original_options.fetch(:config, DMT7::CONFIG_FILE))
-        config_options[:verbosity] = set_verbosity(config_options.fetch(:verbosity, 0), original_options)
-        original_options.merge(config_options)
-      end
-    end
-
     private
 
-    def load_config(file)
-      raise DMT7::Error, "Config file #{file} not found" unless File.readable?(file)
-
-      @load_config ||= YAML.load_file(file).transform_keys(&:to_sym)
-    end
-
     def print_errors(errors = [])
-      logger.error errors.flatten.compact.uniq.join("\n") if options[:verbosity]&.positive?
-    end
-
-    def set_verbosity(verbosity, options)
-      if options.fetch(:verbose, nil).is_a?(Array)
-        verbosity = options[:verbose].all? ? options[:verbose].size : 0
-      end
-
-      # Overide verbosity if dry_run is set
-      verbosity = 1 if options[:dry_run] && verbosity.zero?
-
-      # Overide verbosity if DEBUG is set
-      verbosity = 5 if ENV.fetch("DEBUG", nil)
-
-      verbosity
+      logger.error errors.flatten.compact.uniq.join("\n")
     end
 
     def version_string

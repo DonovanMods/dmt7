@@ -10,8 +10,8 @@ module DMT7
 
         attr_reader :errors, :modlet_configs
 
-        def initialize(modlet_path:, game_configs:, options: {})
-          super(**options)
+        def initialize(modlet_path:, game_configs:)
+          super()
 
           @modlet_path = Pathname.new(modlet_path)
           @modlet_name = @modlet_path.basename
@@ -24,7 +24,7 @@ module DMT7
           result = @game_configs.apply(@modlet_configs)
 
           if result.success?
-            logger.info "XMLs for #{@modlet_name} are valid" if @verbosity.positive?
+            logger.info "XMLs for #{@modlet_name} are valid"
           else
             @errors += result.errors
           end
@@ -43,7 +43,7 @@ module DMT7
 
           logger.info "Validating XMLs in #{truncate_path(@modlet_path)}"
 
-          result = XML::Parse.new(@modlet_path, **@options)
+          result = XML::Parse.new(@modlet_path)
           raise DMT7error, result.errors.join("\n") unless result.success?
 
           result
