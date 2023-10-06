@@ -5,6 +5,7 @@ require "awesome_print"
 
 module DMT7
   module Logging
+    LEVELS = %i[error warn info debug].freeze
     SEVERITY_COLOR = {
       unknown: :white,
       fatal: :purpleish,
@@ -20,8 +21,7 @@ module DMT7
     end
 
     def self.level
-      verbosity = [0, Opt.verbosity || 0].max
-      %i[error warn info debug][[3, verbosity].min]
+      Opt.level || :error
     end
 
     def logger(...)
@@ -39,7 +39,7 @@ module DMT7
     end
 
     def self.logger(stream: $stdout)
-      @logger ||= Logger.new(stream, level:, formatter: Formatter)
+      @logger ||= Logger.new(stream, level:, formatter: Formatter, progname: DMT7::PROGRAM_NAME)
     end
   end
 end

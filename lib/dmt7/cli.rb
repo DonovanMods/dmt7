@@ -17,13 +17,15 @@ module DMT7
       super(...)
 
       config_file = options.fetch(:config, DMT7::CONFIG_FILE)
-      puts "Loading settings from #{config_file}"
-
       Config.load_and_set_settings(config_file)
-      Opt.merge!(**options)
+      Opt.merge!(options)
 
-      set_verbosity
-      Opt.debug = ENV.key?("DEBUG") || Opt.verbosity >= 3
+      set_logging_level
+
+      if ENV.key?("DEBUG") || Opt.level == :debug
+        Opt.debug = true
+        Opt.level = :debug
+      end
 
       logger.debug ["DEBUG MODE ENABLED", "CONFIG_FILE: #{config_file}", "OPTIONS", Opt, ""]
     end
@@ -40,19 +42,15 @@ module DMT7
 
     private
 
-    def set_verbosity
-      Opt.verbosity ||= 0
-
+    def set_logging_level
       # Set verbosity to the number of times -v is used
-      if Opt.verbose.is_a?(Array)
-        Opt.verbosity = Opt.verbose.all? ? Opt.verbose.size : 0
-      end
+      Opt.verbose ||= []
+      verbosity = Opt.verbose.all? ? Opt.verbose.size : 0 # if Opt.verbose.is_a?(Array)
 
       # Overide verbosity zero if dry_run is set
-      Opt.verbosity = 1 if Opt.dry_run && Opt.verbosity.zero?
+      verbosity = 2 if Opt.dry_run && verbosity.zero?
 
-      # Overide verbosity if DEBUG is set
-      Opt.verbosity = 5 if ENV.fetch("DEBUG", nil)
+      Opt.level = Logging::LEVELS[[Logging::LEVELS.size - 1, verbosity].min]
     end
   end
 end

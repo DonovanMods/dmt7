@@ -8,7 +8,6 @@ RSpec.describe DMT7::Plugins::XML::Validate do
   let(:options) do
     {
       game_config_path: "spec/fixtures/test_mod/Config",
-      verbosity: 0
     }
   end
 

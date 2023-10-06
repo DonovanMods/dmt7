@@ -24,8 +24,9 @@ module DMT7
           result = @game_configs.apply(@modlet_configs)
 
           if result.success?
-            logger.info "XMLs for #{@modlet_name} are valid"
+            logger.warn "XMLs for #{@modlet_name} are valid"
           else
+            logger.error "XMLs for #{@modlet_name} are NOT valid"
             @errors += result.errors
           end
 
