@@ -25,7 +25,6 @@ module DMT7
 
           return success("XMLs for #{@modlet_name} are valid") if result.success?
 
-          @errors = result.errors
           failure("XMLs for #{@modlet_name} are NOT valid", errors: result.errors)
 
           self

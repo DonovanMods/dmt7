@@ -17,7 +17,9 @@ module DMT7
       super(...)
 
       config_file = options.fetch(:config, DMT7::CONFIG_FILE)
-      Config.load_and_set_settings(config_file)
+      raise "Config file #{config_file} does not exist, or we can't read it" unless File.readable?(config_file)
+
+      Opt.reload_from_files(config_file)
       Opt.merge!(options)
 
       set_logging_level

@@ -31,6 +31,7 @@ module DMT7
       LONGDESC
       def validate(modlet_path)
         validate = Plugins::XML::Validate.call(modlet_path:, game_configs:)
+        print_errors(validate.errors) if validate.failure?
         exit validate.valid? ? 0 : 1
       end
 

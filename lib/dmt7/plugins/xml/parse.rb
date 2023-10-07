@@ -6,7 +6,7 @@ module DMT7
   module Plugins
     module XML
       class Parse
-        include Logging
+        include ApplicationHelpers
 
         attr_reader :errors, :files, :path, :xml
 
@@ -38,8 +38,17 @@ module DMT7
           modlet.element_children.children.each do |node|
             next unless node.type == Nokogiri::XML::Node::ELEMENT_NODE
 
-            result = invoke_command(node)
-            @errors += result.errors if result&.failure?
+            xpath = clean_xpath(node["xpath"])
+            next unless xpath
+
+            parent = @xml.at_xpath(xpath)
+            if parent.nil?
+              errors << "Failed to find xpath #{xpath} in #{node.name}"
+              next
+            end
+
+            result = invoke_command(node, parent)
+            @errors += result&.errors if result&.failure?
           end
 
           self
@@ -89,10 +98,10 @@ module DMT7
           @errors << e.message
         end
 
-        def invoke_command(node)
+        def invoke_command(node, parent)
           case node.name
           when "append"
-            Commands::Append.call(node, @xml)
+            Commands::Append.call(node, parent)
           when /(csv|set)/
             ApplicationService.new
           else

@@ -1,8 +1,6 @@
 # typed: true
 # frozen_string_literal: true
 
-require "english"
-
 module DMT7
   module Plugins
     class Version

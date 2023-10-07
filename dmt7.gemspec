@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative "lib/dmt7"
+require_relative "lib/dmt7/globals"
 
 Gem::Specification.new do |spec|
   spec.name = "dmt7"
   spec.version = DMT7::VERSION
-  spec.authors = ["Donovan Young"]
+  spec.authors = [DMT7::AUTHOR]
   spec.email = ["dyoung522@gmail.com"]
 
   spec.summary = "Tools for modding 7 Days to Die"
